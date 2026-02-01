@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Invite 💕</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        h1 { color: #764ba2; text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-secondary { background: #f0f0f0; color: #667eea; }
+        
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .option-card {
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .option-card.selected { border-color: #667eea; background: #e3f2fd; }
+        
+        /* RECIPIENT VIEW (THE INVITE) */
+        .invite-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+        .emoji-big { font-size: 60px; margin-bottom: 20px; }
+        .tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+        .buttons-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            position: relative;
+            min-height: 60px;
+        }
+        .btn-yes {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            font-size: 22px;
+            flex: 1;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        .btn-no {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+            width: 120px;
+            position: relative;
+        }
+        
+        .share-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            word-break: break-all;
+            font-size: 0.9em;
+            color: #667eea;
+            border: 2px dashed #667eea;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        
+        #creator-view { display: none; }
+        #recipient-view { display: none; }
+        
+        .success-msg {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        .success-msg.show { display: block; animation: bounceIn 0.6s; }
+        @keyframes bounceIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- CREATOR FORM (Only you see this) -->
+    <div id="creator-view">
+        <div class="step active" id="step1">
+            <div class="card">
+                <h1>💕 Create Invite</h1>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="fromName" placeholder="e.g. Alex">
+                </div>
+                <div class="form-group">
+                    <label>Their Name</label>
+                    <input type="text" id="toName" placeholder="e.g. Sam">
+                </div>
+                <div class="form-group">
+                    <label>When?</label>
+                    <input type="datetime-local" id="dateTime">
+                </div>
+                <button class="btn" onclick="goStep(2)">Next ➡️</button>
+            </div>
+        </div>
+
+        <div class="step" id="step2">
+            <div class="card">
+                <h1>Food? 🍽️</h1>
+                <div class="options-grid">
+                    <div class="option-card" onclick="pick('food','Italian',this)">🍝 Italian</div>
+                    <div class="option-card" onclick="pick('food','Sushi',this)">🍣 Sushi</div>
+                    <div class="option-card" onclick="pick('food','Pizza',this)">🍕 Pizza</div>
+                    <div class="option-card" onclick="pick('food','Burgers',this)">🍔 Burgers</div>
+                </div>
+                <button class="btn btn-secondary" onclick="goStep(1)">Back</button>
+                <button class="btn" onclick="goStep(3)">Next ➡️</button>
+            </div>
+        </div>
+
+        <div class="step" id="step3">
+            <div class="card">
+                <h1>Activity? 🎯</h1>
+                <div class="options-grid">
+                    <div class="option-card" onclick="pick('act','Movies',this)">🎬 Movies</div>
+                    <div class="option-card" onclick="pick('act','Park',this)">🌳 Park</div>
+                    <div class="option-card" onclick="pick('act','Gaming',this)">🎮 Gaming</div>
+                    <div class="option-card" onclick="pick('act','Stargazing',this)">✨ Stars</div>
+                </div>
+                <button class="btn btn-secondary" onclick="goStep(2)">Back</button>
+                <button class="btn" onclick="createLink()">Create 💌</button>
+            </div>
+        </div>
+
+        <div class="step" id="step4">
+            <div class="card">
+                <h1>Done! 🎉</h1>
+                <p style="text-align:center; margin-bottom:10px;">Send this link to them:</p>
+                <div class="share-box" onclick="copyText()" id="theLink">Creating...</div>
+                <p style="font-size:0.85em; color:#666; text-align:center;">
+                    They will see the invite (not this form)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECIPIENT INVITE (They see ONLY this) -->
+    <div id="recipient-view">
+        <div class="card" id="invite-box">
+            <div class="invite-card">
+                <div class="emoji-big">💌</div>
+                <h2 style="color:#d63031; margin-bottom:15px;">Date Invitation!</h2>
+                <div style="font-size:1.2em; margin:20px 0;">
+                    <strong id="show-from" style="color:#764ba2; font-size:1.2em;"></strong> wants to take<br>
+                    <strong id="show-to"></strong> on a date!
+                </div>
+                <div style="background:rgba(255,255,255,0.8); padding:15px; border-radius:15px; margin:15px 0;">
+                    <div id="show-when" style="font-weight:bold; margin-bottom:10px;"></div>
+                    <div id="show-what"></div>
+                </div>
+                
+                <h3 style="color:#d63031; margin:25px 0 15px;">Will you go? 🥺</h3>
+                
+                <div class="buttons-row">
+                    <button class="btn btn-yes" onclick="sayYes()">YES! 💕</button>
+                    <button class="btn btn-no" id="noBtn" onmouseover="run()" onclick="run()">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="yes-msg" class="success-msg">
+            <div style="font-size:80px; margin-bottom:20px;">🎉💕</div>
+            <h2 style="color:#00b894;">Yay! See you there!</h2>
+        </div>
+
+        <div id="no-msg" class="success-msg">
+            <div style="font-size:80px; margin-bottom:20px;">😢</div>
+            <h2 style="color:#d63031;">Maybe next time...</h2>
+        </div>
+    </div>
+</div>
+
+<script>
+let data = {};
+let isRecipient = false;
+
+// IMMEDIATE CHECK: Are we creating or viewing?
+(function init() {
+    const params = new URLSearchParams(location.search);
+    
+    // If URL has "to" parameter = RECIPIENT (viewing invite)
+    if (params.get('to')) {
+        isRecipient = true;
+        document.getElementById('creator-view').style.display = 'none';
+        document.getElementById('recipient-view').style.display = 'block';
+        
+        // Fill their view
+        document.getElementById('show-from').textContent = params.get('from');
+        document.getElementById('show-to').textContent = params.get('to');
+        document.getElementById('show-when').textContent = new Date(params.get('date')).toLocaleString();
+        document.getElementById('show-what').innerHTML = 
+            '<span class="tag">🍽️ ' + params.get('food') + '</span> ' +
+            '<span class="tag">🎯 ' + params.get('act') + '</span>';
+    } 
+    // Else = CREATOR (making invite)
+    else {
+        document.getElementById('creator-view').style.display = 'block';
+        document.getElementById('recipient-view').style.display = 'none';
+    }
+})();
+
+function goStep(n) {
+    if (n === 2) {
+        data.from = document.getElementById('fromName').value;
+        data.to = document.getElementById('toName').value;
+        data.date = document.getElementById('dateTime').value;
+        if (!data.from || !data.to || !data.date) return alert('Fill all fields!');
+    }
+    if (n === 3 && !data.food) return alert('Pick food!');
+    
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step'+n).classList.add('active');
+}
+
+function pick(type, val, el) {
+    if (type === 'food') data.food = val;
+    else data.act = val;
+    el.parentElement.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function createLink() {
+    if (!data.act) return alert('Pick activity!');
+    
+    const url = new URL(window.location.href);
+    url.searchParams.set('from', data.from);
+    url.searchParams.set('to', data.to);
+    url.searchParams.set('date', data.date);
+    url.searchParams.set('food', data.food);
+    url.searchParams.set('act', data.act);
+    
+    document.getElementById('theLink').textContent = url.toString();
+    goStep(4);
+}
+
+function copyText() {
+    const t = document.getElementById('theLink').textContent;
+    navigator.clipboard.writeText(t).then(() => alert('Copied! Send it 💕'));
+}
+
+function run() {
+    const btn = document.getElementById('noBtn');
+    const box = btn.parentElement;
+    btn.style.position = 'absolute';
+    btn.style.left = Math.random() * (box.offsetWidth - 100) + 'px';
+    btn.style.top = Math.random() * (box.offsetHeight - 50) + 'px';
+}
+
+function sayYes() {
+    document.getElementById('invite-box').style.display = 'none';
+    document.getElementById('yes-msg').classList.add('show');
+}
+</script>
+
+</body>
+</html>
